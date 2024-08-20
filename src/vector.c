@@ -7,6 +7,19 @@
 
 #define VECTOR_INIT_CAPACITY 1;
 
+bool vector_resize(struct Vector* vector, size_t newCapacity);
+void vector_free(struct Vector* vector);
+
+void vector_clear(struct Vector* vector);
+void* vector_getData(const struct Vector* vector);
+size_t vector_getLength(const struct Vector* vector);
+size_t vector_getCapacity(const struct Vector* vector);
+size_t vector_getElementSize(const struct Vector* vector);
+void vector_set(struct Vector* vector, size_t index, const void* newElement);
+void* vector_get(const Vector* vector, size_t index);
+void* vector_push(struct Vector* vector, const void* element);
+void* vector_pop(struct Vector* vector);
+
 struct Vector* vector_init(size_t elementSize, size_t capacity)
 {
     assert(elementSize > 0);
@@ -20,11 +33,22 @@ struct Vector* vector_init(size_t elementSize, size_t capacity)
     vector->elementSize = elementSize;
     vector->data = malloc(elementSize * vector->capacity);
     
+    
     if (!vector->data)
     {
         free(vector);
         return NULL;
     }
+
+    vector->clear = vector_clear;
+    vector->getData = vector_getData;
+    vector->getLength = vector_getLength;
+    vector->getCapacity = vector_getCapacity;
+    vector->getElementSize = vector_getElementSize;
+    vector->set = vector_set;
+    vector->get = vector_get;
+    vector->push = vector_push;
+    vector->pop = vector_pop;
 
     return vector;
 }
@@ -120,7 +144,6 @@ void* vector_push(struct Vector* vector, const void* element)
     }
 
     vector->length++;
-      return (void*)destination;
 }
 
 bool vector_resize(struct Vector *vector, size_t newCapacity)

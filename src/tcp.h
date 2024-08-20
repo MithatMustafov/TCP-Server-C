@@ -7,55 +7,56 @@
 
 #define TCP_MAX_PAYLOAD_SIZE 1024
 
-typedef struct tcpSocket
+typedef struct
 {
-    int socket_fd;  // File descriptor for the socket
-} tcp_socket_t;
+    // File descriptor for the socket
+    int socket_FileDescriptor;  
+} tcpSocket_t;
 
 // Initializes the TCP library
-void tcp_init(void);
+void tcpSocket_init(void);
 
 // Creates a new TCP socket and returns a handle
-tcp_socket_t* tcp_create_socket(void);
+tcpSocket_t* tcpSocket_create(void);
 
 // Binds a TCP socket to an address and port
-int tcp_bind(tcp_socket_t* sock, const char* address, uint16_t port);
+int tcpSocket_bind(tcpSocket_t* socket, const char* address, uint16_t port);
 
 // Listens for incoming connections on a TCP socket
-int tcp_listen(tcp_socket_t* sock, int backlog);
+int tcpSocket_listen(tcpSocket_t* socket, int backlog);
 
 // Accepts an incoming connection and returns a new socket handle
-tcp_socket_t* tcp_accept(tcp_socket_t* server_sock);
+tcpSocket_t* tcpSocket_accept(tcpSocket_t* socketServer);
 
 // Connects to a remote TCP server
-int tcp_connect(tcp_socket_t* sock, const char* address, uint16_t port);
+int tcpSocket_connect(tcpSocket_t* socket, const char* address, uint16_t port);
 
 // Sends data through a TCP socket
-size_t tcp_send(tcp_socket_t* sock, const void* data, size_t length);
+size_t tcpSocket_Send(tcpSocket_t* socket, const void* data, size_t length);
 
 // Receives data from a TCP socket
-size_t tcp_recive(tcp_socket_t* sock, void* buffer, size_t length);
+size_t tcpSocket_recive(tcpSocket_t* socket, void* buffer, size_t length);
 
 // Closes a TCP socket
-void tcp_close(tcp_socket_t* sock);
+void tcpSocket_close(tcpSocket_t* socket);
 
 // Manages a vector of TCP sockets
 typedef struct
 {
     struct Vector* sockets;
-    struct Vector* poll_fds;  // Vector for pollfd structs
-} tcp_socket_manager_t;
+    struct Vector* poll_FileDescriptor;  // Vector for pollfd structs
+} tcpSocketManager_t;
 
 // Initializes a TCP socket manager
-tcp_socket_manager_t* tcp_socketManager_init(void);
+tcpSocketManager_t* tcpSocketManager_init(void);
 
 // Adds a TCP socket to the manager
-void tcp_socketManager_add(tcp_socket_manager_t* manager, tcp_socket_t* sock);
+void tcpSocketManager_add(tcpSocketManager_t* manager, tcpSocket_t* socket);
 
 // Removes a TCP socket from the manager
-void tcp_socketManager_remove(tcp_socket_manager_t* manager, tcp_socket_t* sock);
+void tcpSocketManager_remove(tcpSocketManager_t* manager, tcpSocket_t* socket);
 
 // Frees the TCP socket manager
-void tcp_socketManager_free(tcp_socket_manager_t* manager);
+void tcpSocketManager_free(tcpSocketManager_t* manager);
 
 #endif // TCP_H
