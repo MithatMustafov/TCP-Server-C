@@ -126,7 +126,7 @@ int tcpSocket_connect(tcpSocket_t* socket, const char* address, uint16_t port)
 }
 
 // Send data through a TCP socket
-size_t tcpSocket_Send(tcpSocket_t* socket, const void* data, size_t length)
+size_t tcpSocket_send(tcpSocket_t* socket, const void* data, size_t length)
 {
     int result = send(socket->socket_FileDescriptor, (const char*)data, (int)length, 0);
     
@@ -140,10 +140,11 @@ size_t tcpSocket_Send(tcpSocket_t* socket, const void* data, size_t length)
 }
 
 // Receive data from a TCP socket
-size_t tcpSocket_recive(tcpSocket_t* socket, void* buffer, size_t length)
+size_t tcpSocket_receive(tcpSocket_t* socket, void* buffer, size_t length)
 {
     int result = recv(socket->socket_FileDescriptor, (char*)buffer, (int)length, 0);
-    if (result == SOCKET_ERROR) {
+    if (result == SOCKET_ERROR)
+    {
         fprintf(stderr, "Receive failed: %d\n", WSAGetLastError());
         return -1;
     }
@@ -176,8 +177,9 @@ tcpSocketManager_t* tcpSocketManager_init(void)
 
     // Initialize poll_fds vector with default element size and capacity
     newTcpSocketManager->poll_FileDescriptor = vector_init(sizeof(struct pollfd), 1);
-    if (!newTcpSocketManager->poll_FileDescriptor) {
-        vector_free(newTcpSocketManager->sockets);
+    if (!newTcpSocketManager->poll_FileDescriptor)
+    {
+        newTcpSocketManager->sockets->free(newTcpSocketManager->sockets);
         free(newTcpSocketManager);
         return NULL;
     }
@@ -188,7 +190,7 @@ tcpSocketManager_t* tcpSocketManager_init(void)
 // Add a TCP socket to the manager
 void tcpSocketManager_add(tcpSocketManager_t* tcpSocketManager, tcpSocket_t* socket)
 {
-    vector_push(tcpSocketManager->sockets, socket);
+    tcpSocketManager->sockets->push(tcpSocketManager->sockets, socket);
     struct pollfd pfd;
     pfd.fd = socket->socket_FileDescriptor;
     pfd.events = POLLIN;
@@ -209,7 +211,7 @@ void tcpSocketManager_remove(tcpSocketManager_t* tcpSocketManager, tcpSocket_t* 
             if(index < socketsLength - 1)
             {
                 tcpSocket_t* lastSock =
-                *(tcpSocket_t**)vector_get(tcpSocketManager->sockets, socketsLength - 1);
+                *(tcpSocket_t**)tcpSocketManager->sockets->get(tcpSocketManager->sockets, socketsLength - 1);
                 
                 tcpSocketManager->sockets->set(tcpSocketManager->sockets, index, &lastSock);
             }
@@ -241,8 +243,9 @@ void tcpSocketManager_remove(tcpSocketManager_t* tcpSocketManager, tcpSocket_t* 
             break;
         }
     }
+    
     // Close the socket
-    tcpsocket_close(socket);
+    tcpSocket_close(socket);
 }
 
 // Frees the TCP socket manager
@@ -251,9 +254,9 @@ void tcpSocketManager_free(tcpSocketManager_t* tcpSocketManager)
     for (size_t i = 0; i < vector_getLength(tcpSocketManager->sockets); i++)
     {
         tcpSocket_t* socket = vector_get(tcpSocketManager->sockets, i);
-        tcp_close(socket);
+        tcpSocket_close(socket);
     }
-    vector_free(tcpSocketManager->sockets);
-    vector_free(tcpSocketManager->poll_FileDescriptor);
+    tcpSocketManager->sockets->free(tcpSocketManager->sockets);
+    tcpSocketManager->poll_FileDescriptor->free(tcpSocketManager->poll_FileDescriptor);
     free(tcpSocketManager);
 }

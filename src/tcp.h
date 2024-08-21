@@ -1,4 +1,4 @@
- #ifndef TCP_H
+#ifndef TCP_H
 #define TCP_H
 
 #include <stddef.h>
@@ -32,10 +32,10 @@ tcpSocket_t* tcpSocket_accept(tcpSocket_t* socketServer);
 int tcpSocket_connect(tcpSocket_t* socket, const char* address, uint16_t port);
 
 // Sends data through a TCP socket
-size_t tcpSocket_Send(tcpSocket_t* socket, const void* data, size_t length);
+size_t tcpSocket_send(tcpSocket_t* socket, const void* data, size_t length);
 
 // Receives data from a TCP socket
-size_t tcpSocket_recive(tcpSocket_t* socket, void* buffer, size_t length);
+size_t tcpSocket_receive(tcpSocket_t* socket, void* buffer, size_t length);
 
 // Closes a TCP socket
 void tcpSocket_close(tcpSocket_t* socket);
