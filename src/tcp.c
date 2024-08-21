@@ -194,13 +194,13 @@ void tcpSocketManager_add(tcpSocketManager_t* tcpSocketManager, tcpSocket_t* soc
     struct pollfd pfd;
     pfd.fd = socket->socket_FileDescriptor;
     pfd.events = POLLIN;
-    vector_push(tcpSocketManager->poll_FileDescriptor, &pfd);
+    tcpSocketManager->poll_FileDescriptor->push(tcpSocketManager->poll_FileDescriptor, &pfd);
 }
 
 void tcpSocketManager_remove(tcpSocketManager_t* tcpSocketManager, tcpSocket_t* socket)
 {
     //Remove the TCP socket from the sockets vector
-    size_t socketsLength = tcpSocketManager->sockets->getLength;
+    size_t socketsLength = tcpSocketManager->sockets->getLength(tcpSocketManager->sockets);
     for (size_t index = 0; index < socketsLength; index++)
     {
         tcpSocket_t* currentSocket =
@@ -223,7 +223,7 @@ void tcpSocketManager_remove(tcpSocketManager_t* tcpSocketManager, tcpSocket_t* 
     }
 
     //Remove the pollfd from the poll_fds vector
-    size_t pollFdsLength = vector_getLength(tcpSocketManager->poll_FileDescriptor);
+    size_t pollFdsLength = tcpSocketManager->poll_FileDescriptor->getLength(tcpSocketManager->poll_FileDescriptor);
     for (size_t index = 0; index < pollFdsLength; index++)
     {
         struct pollfd* pfd =
@@ -251,9 +251,9 @@ void tcpSocketManager_remove(tcpSocketManager_t* tcpSocketManager, tcpSocket_t* 
 // Frees the TCP socket manager
 void tcpSocketManager_free(tcpSocketManager_t* tcpSocketManager)
 {
-    for (size_t i = 0; i < vector_getLength(tcpSocketManager->sockets); i++)
+    for (size_t i = 0; i < tcpSocketManager->sockets->getLength(tcpSocketManager->sockets); i++)
     {
-        tcpSocket_t* socket = vector_get(tcpSocketManager->sockets, i);
+        tcpSocket_t* socket = tcpSocketManager->sockets->get(tcpSocketManager->sockets, i);
         tcpSocket_close(socket);
     }
     tcpSocketManager->sockets->free(tcpSocketManager->sockets);
